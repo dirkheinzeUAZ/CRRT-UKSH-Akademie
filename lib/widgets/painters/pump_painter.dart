@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'draw_utils.dart';
 
 /// Zeichnet eine Schlauchrollenpumpe (peristaltische Pumpe) im multiFiltrate-Stil:
 /// weißes/cremefarbenes Gehäuse mit rotierenden Rollen + farbiger Schlauchführung.
@@ -78,57 +77,3 @@ void drawPeristalticPump(
         ..strokeWidth = 2);
 }
 
-/// Zeichnet die Heparin-Spritzenpumpe (rechteckiges Modul mit Glaszylinder + Kolben).
-void drawSyringePump(Canvas canvas, {
-  required Rect rect,
-  required Color color,
-  required bool active,
-  required double machTick,
-}) {
-  final x = rect.left, y = rect.top, w = rect.width, h = rect.height;
-
-  canvas.drawPath(roundedRectPath(x - 3, y - 3, w + 6, h + 6, 9),
-      Paint()..color = const Color(0xFFF3F5F9));
-  canvas.drawPath(roundedRectPath(x - 3, y - 3, w + 6, h + 6, 9),
-      Paint()
-        ..color = const Color(0xFFAEB8C8)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.4);
-
-  // Glaszylinder
-  canvas.drawPath(roundedRectPath(x + 6, y + 4, w - 24, h - 8, 5),
-      Paint()..color = Colors.white.withValues(alpha: 0.55));
-  canvas.drawPath(roundedRectPath(x + 6, y + 4, w - 24, h - 8, 5),
-      Paint()
-        ..color = const Color(0xFF9FB0C8)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1);
-
-  // Skalenstriche
-  final tickPaint = Paint()
-    ..color = const Color(0xFF9FB0C8).withValues(alpha: 0.6)
-    ..strokeWidth = 0.8;
-  for (int i = 0; i < 5; i++) {
-    final tx = x + 12 + i * (w - 34) / 4;
-    canvas.drawLine(Offset(tx, y + 5), Offset(tx, y + h - 5), tickPaint);
-  }
-
-  // Kolben (bewegt sich, wenn aktiv)
-  final plx = x + 10 + (active ? ((machTick * 0.5) % (w - 26)) : (w - 26) * 0.5);
-  canvas.drawLine(Offset(plx, y + 3), Offset(plx, y + h - 3),
-      Paint()
-        ..color = color
-        ..strokeWidth = 4
-        ..strokeCap = StrokeCap.round);
-
-  // Ansatzstück rechts
-  final tipPath = Path()
-    ..moveTo(x + w - 12, y + h / 2 - 4)
-    ..lineTo(x + w - 12, y + h / 2 + 4)
-    ..lineTo(x + w - 2, y + h / 2)
-    ..close();
-  canvas.drawPath(tipPath, Paint()..color = const Color(0xFF8B96A8));
-
-  drawText(canvas, 'Heparin', Offset(x + w / 2, y + h + 12),
-      color: color, fontSize: 9, weight: FontWeight.bold, align: TextAlign.center, fontFamily: 'sans-serif');
-}

@@ -51,17 +51,6 @@ class _ControlPanelState extends State<ControlPanel> {
             indicator: _pumpIndicatorRow(AppColors.blood, 'Arterieller Kreislauf'),
           ),
 
-          // ③ Heparinpumpe
-          ParamSlider(
-            label: '③ Heparinpumpe',
-            valueText: '${st.qSyringe.toStringAsFixed(1)} ml/h',
-            value: st.qSyringe,
-            min: 0,
-            max: 20,
-            divisions: 40,
-            accent: AppColors.heparin,
-            onChanged: st.setQSyringe,
-          ),
           const Divider(height: 16, color: AppColors.borderBlue),
 
           // ④ Dialysatpumpe

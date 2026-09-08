@@ -9,8 +9,6 @@ import 'draw_utils.dart';
 void drawLabels(Canvas canvas, CrrtState st) {
   drawText(canvas, '① Abflusspumpe', Offset(ML.p1cx, ML.p1cy + ML.p1r + 22),
       color: AppColors.effluent, fontSize: 11, weight: FontWeight.bold, align: TextAlign.center, fontFamily: 'sans-serif');
-  drawText(canvas, '③ Heparinpumpe', Offset(ML.p3x + ML.p3w / 2, ML.p3y + ML.p3h + 24),
-      color: AppColors.heparin, fontSize: 10, weight: FontWeight.bold, align: TextAlign.center, fontFamily: 'sans-serif');
   if (st.hasDialysat) {
     drawText(canvas, '④ Dialysatpumpe', Offset(ML.p4cx, ML.p4cy + ML.p4r + 22),
         color: AppColors.dialysate, fontSize: 11, weight: FontWeight.bold, align: TextAlign.center, fontFamily: 'sans-serif');

@@ -299,13 +299,4 @@ void _drawAnimParticles(Canvas canvas, CrrtState st, double hF, double clot, dou
       canvas.drawCircle(Offset(fX + 6, py), 2.2, Paint()..color = AppColors.substituate.withValues(alpha: sR * 0.7));
     }
   }
-
-  // Heparin (orange, winzig, oberer Blutbereich)
-  if (st.qSyringe > 0) {
-    for (int i = 0; i < 5; i++) {
-      final py = fY + 16 + i * 26 + ((t * 0.5) % 26);
-      if (py > fY + fH) continue;
-      canvas.drawCircle(Offset(fX + 6, py), 1.8, Paint()..color = AppColors.heparin.withValues(alpha: 0.55));
-    }
-  }
 }

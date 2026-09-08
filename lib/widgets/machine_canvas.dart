@@ -86,14 +86,6 @@ class _MachinePainter extends CustomPainter {
     );
     drawEffluentIndicator(canvas, st);
 
-    drawSyringePump(
-      canvas,
-      rect: const Rect.fromLTWH(ML.p3x, ML.p3y, ML.p3w, ML.p3h),
-      color: const Color(0xFFF97316),
-      active: st.running && st.qSyringe > 0,
-      machTick: st.machTick,
-    );
-
     if (st.hasDialysat) {
       drawPeristalticPump(
         canvas,

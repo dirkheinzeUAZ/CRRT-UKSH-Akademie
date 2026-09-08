@@ -12,7 +12,6 @@ import 'draw_utils.dart';
 ///  - Dialysat: GRÜN
 ///  - Effluat/Abfluss: GELB
 ///  - Substituat: CYAN, umschaltbar Prä-/Postdilution über Weiche
-///  - Heparin: ORANGE
 void drawTubing(Canvas canvas, CrrtState st) {
   const fX = ML.fX, fY = ML.fY, fW = ML.fW, fH = ML.fH;
   final fB = fY + fH;
@@ -39,12 +38,6 @@ void drawTubing(Canvas canvas, CrrtState st) {
   drawConnectorCap(canvas, const Offset(6, ML.patYArt), AppColors.arterialCap, r: 13, label: 'art.');
   tube([const Offset(18, ML.patYArt), Offset(ML.p6cx - ML.p6r - 12, ML.p6cy)], AppColors.blood, lw: 6);
   drawArrowHead(canvas, Offset(ML.p6cx - ML.p6r - 30, ML.patYArt), 0, AppColors.blood, size: 9);
-
-  // Heparin -> Blutlinie kurz vor Pumpe
-  tube([
-    Offset(ML.p3x + ML.p3w / 2, ML.p3y + ML.p3h),
-    Offset(ML.p3x + ML.p3w / 2, ML.p6cy - ML.p6r * 0.4),
-  ], AppColors.heparin, lw: 3, dashed: false);
 
   // Blutpumpe -> Filter Bluteinlass (oben links) – Bogen ohne Kreuzung
   tube([

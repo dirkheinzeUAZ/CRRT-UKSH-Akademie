@@ -35,7 +35,6 @@ class AppColors {
   static const filtrate     = Color(0xFFA855F7); // Filtrat = lila
   static const effluent     = Color(0xFFEAB308); // Effluat/Abfluss = gelb
   static const substituate  = Color(0xFF06B6D4); // Substituat = cyan/türkis
-  static const heparin      = Color(0xFFF97316); // Heparin = orange
   static const toxin        = Color(0xFFFBBF24); // Urämietoxine (Diffusion)
   static const clot         = Color(0xFF7C2D12); // Verklottung / Thrombus
 
@@ -46,7 +45,6 @@ class AppColors {
       case 'filtrate': return filtrate;
       case 'effluent': return effluent;
       case 'substituate': return substituate;
-      case 'heparin': return heparin;
       default: return accentBlue;
     }
   }

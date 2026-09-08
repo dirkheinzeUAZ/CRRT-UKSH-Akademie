@@ -34,7 +34,6 @@ void drawScreen(Canvas canvas, CrrtState st) {
   final qEff = st.qEff;
   final allBars = <_BarSpec>[
     _BarSpec('ABFL', st.speedEffluent.clamp(0, 1), AppColors.effluent, '${qEff.round()} ml/h', true),
-    _BarSpec('HEP', st.qSyringe / 20, AppColors.heparin, '${st.qSyringe.toStringAsFixed(1)}ml/h', true),
     _BarSpec('DIAL', st.qd / 3000, AppColors.dialysate, '${st.qd.round()}ml/h', st.hasDialysat),
     _BarSpec('SUB', st.qs / 3000, AppColors.substituate, '${st.qs.round()}ml/h', st.hasSubstPump),
     _BarSpec('BLUT', st.qb / 300, AppColors.blood, '${st.qb.round()}ml/m', true),

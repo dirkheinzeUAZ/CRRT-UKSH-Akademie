@@ -14,9 +14,8 @@ class ML {
   static const double fX = 235, fY = 300, fW = 250, fH = 500;
   static double get mX => fX + fW / 2;
 
-  // Pumpen – links: Blutpumpe (groß) + Heparin-Spritzenpumpe
+  // Pumpen – links: Blutpumpe (groß)
   static const p6cx = 96.0, p6cy = 460.0, p6r = 62.0; // Blutpumpe
-  static const p3x = 24.0, p3y = 330.0, p3w = 78.0, p3h = 26.0; // Heparin
 
   // Pumpen – rechts: Abfluss (oben), Dialysat (mitte), Substituat (unten)
   static const p1cx = 624.0, p1cy = 330.0, p1r = 30.0; // Abflusspumpe

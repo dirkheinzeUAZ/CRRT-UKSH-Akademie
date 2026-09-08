@@ -32,7 +32,6 @@ class CrrtState extends ChangeNotifier {
   double qd = 1500; // Dialysatpumpe ml/h [0-3000]
   double quf = 500; // Netto-Flüssigkeitsentzug ml/h [0-2500]
   double qs = 0; // Substitutionspumpe ml/h [0-3000]
-  double qSyringe = 5; // Heparinpumpe ml/h [0-20]
 
   // Filter-Eigenschaften – stufenlos einstellbar (Lehrzwecke)
   double filterPermeability = 1.0; // 0..1  (1 = optimal durchlässig)
@@ -158,11 +157,6 @@ class CrrtState extends ChangeNotifier {
 
   void setQs(double v) {
     qs = v;
-    notifyListeners();
-  }
-
-  void setQSyringe(double v) {
-    qSyringe = v;
     notifyListeners();
   }
 

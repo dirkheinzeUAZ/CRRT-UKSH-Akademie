@@ -14,7 +14,6 @@ class LegendBar extends StatelessWidget {
       (AppColors.toxin, 'Urämietoxine (Diffusion)'),
       (AppColors.filtrate, 'Filtrat (Konvektion)'),
       (AppColors.substituate, 'Substituat'),
-      (AppColors.heparin, 'Heparin'),
       (AppColors.effluent, 'Effluat/Abfluss'),
     ];
     return Wrap(
