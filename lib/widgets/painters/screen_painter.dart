@@ -29,18 +29,26 @@ void drawScreen(Canvas canvas, CrrtState st) {
       ..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: const [Color(0xFF071322), Color(0xFF0C1E32)]).createShader(displayRect),
   );
 
-  // Titelzeile
-  canvas.drawRect(Rect.fromLTWH(sX + 5, dY, sW - 10, 22), Paint()..color = const Color(0xFF0D2646));
-  drawText(canvas, 'CRRT-SIM  ITS  –  ${modeLabel(st.mode)}', Offset(W / 2, dY + 15),
+  // Titelzeile (Balkenhöhe 22px, Text oben-bündig innerhalb des Balkens platziert)
+  const titleBarH = 22.0;
+  canvas.drawRect(Rect.fromLTWH(sX + 5, dY, sW - 10, titleBarH), Paint()..color = const Color(0xFF0D2646));
+  drawText(canvas, 'CRRT-SIM  ITS  –  ${modeLabel(st.mode)}', Offset(W / 2, dY + 4),
       color: AppColors.accentBlue, fontSize: 13, weight: FontWeight.bold, align: TextAlign.center, fontFamily: 'monospace');
 
   // Filter-Laufzeit (große, zentrale Anzeige – das einzige, was hier zählt)
+  // Hinweis: drawText() positioniert an der TOP-Kante des Textes (kein vertikales
+  // Zentrieren). Die Y-Offsets sind daher explizit so gestaffelt, dass jede Zeile
+  // erst beginnt, wo die vorherige (inkl. Zeilenhöhe) bereits geendet hat.
   final fh = (st.filterRuntimeMin ~/ 60).toString().padLeft(2, '0');
   final fm = (st.filterRuntimeMin % 60).toString().padLeft(2, '0');
-  drawText(canvas, '$fh:$fm', Offset(W / 2, dY + 56), color: Colors.white, fontSize: 32, weight: FontWeight.bold, align: TextAlign.center, fontFamily: 'monospace');
-  drawText(canvas, 'FILTER-LAUFZEIT', Offset(W / 2, dY + 82), color: AppColors.textDim, fontSize: 11, align: TextAlign.center, fontFamily: 'monospace');
+  final clockY = dY + titleBarH + 10; // Abstand zur Titelleiste
+  drawText(canvas, '$fh:$fm', Offset(W / 2, clockY), color: Colors.white, fontSize: 32, weight: FontWeight.bold, align: TextAlign.center, fontFamily: 'monospace');
 
+  final labelY = clockY + 40; // Uhr-Zeilenhöhe (~38px bei fontSize 32) + Puffer
+  drawText(canvas, 'FILTER-LAUFZEIT', Offset(W / 2, labelY), color: AppColors.textDim, fontSize: 11, align: TextAlign.center, fontFamily: 'monospace');
+
+  final statusY = labelY + 16; // Label-Zeilenhöhe (~14px bei fontSize 11) + Puffer
   final statusText = st.running ? '●  LÄUFT' : (st.filterRuntimeMin > 0 ? '⏸  PAUSE' : '●  BEREIT');
   final statusColor = st.running ? AppColors.ok : AppColors.textDim;
-  drawText(canvas, statusText, Offset(W / 2, dY + 98), color: statusColor, fontSize: 11, weight: FontWeight.bold, align: TextAlign.center, fontFamily: 'monospace');
+  drawText(canvas, statusText, Offset(W / 2, statusY), color: statusColor, fontSize: 11, weight: FontWeight.bold, align: TextAlign.center, fontFamily: 'monospace');
 }
