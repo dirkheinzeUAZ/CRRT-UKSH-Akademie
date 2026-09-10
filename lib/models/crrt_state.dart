@@ -67,17 +67,17 @@ class CrrtState extends ChangeNotifier {
   bool get hasSubstPump => mode == CrrtMode.cvvhdf || mode == CrrtMode.cvvhf;
 
   /// Abflusspumpe (Qeff) – automatisch berechnet, NICHT manuell einstellbar.
-  /// Transportiert 100% des verbrauchten Dialysats + Netto-Entzug + (bei Prädilution) Substituat.
-  double get qEff {
-    final qsPre = (subMode == SubMode.pre) ? qs : 0.0;
-    return qd + quf + qsPre;
-  }
+  /// Transportiert 100% des verbrauchten Dialysats + Netto-Entzug + 100% des
+  /// Substituats. WICHTIG (klinisch korrekt): Das Substituat wird UNABHÄNGIG
+  /// von Prä- oder Postdilution vollständig mitgerechnet – egal wo es einge-
+  /// speist wird, muss dieses Volumen zusätzlich zum eingestellten Nettoentzug
+  /// (QUF) durch die Abflusspumpe entfernt werden, sonst würde die Substitution
+  /// die Bilanz verfälschen und der Nettoentzug nicht tatsächlich erreicht.
+  double get qEff => qd + quf + qs;
 
-  /// Filtrationsrate = konvektiver Fluss durch die Membran (UF + ggf. prädilutiertes Substituat).
-  double get filtrationRate {
-    final qsPre = (subMode == SubMode.pre) ? qs : 0.0;
-    return quf + qsPre;
-  }
+  /// Filtrationsrate = konvektiver Fluss durch die Membran (Netto-UF + Substituat,
+  /// unabhängig von Prä-/Postdilution – siehe Erläuterung bei qEff).
+  double get filtrationRate => quf + qs;
 
   /// Kombinierter Verklottungsfaktor: manueller Regler + automatischer Laufzeit-Anteil.
   double get autoClotFactor => (filterRuntimeMin / (24 * 60)).clamp(0, 1);
@@ -191,14 +191,16 @@ class CrrtState extends ChangeNotifier {
   double get speedSubst => qs / 3000;
 
   /// Referenzwert für "volle Drehzahl" der Abflusspumpe (rein visuelle Skalierung).
-  /// QD_max (3000) + QUF_max (2500) wird als realistischer Referenzrahmen genutzt.
-  static const double _qEffVisualMax = 3000 + 2500;
+  /// WICHTIG: Nutzt bewusst DIESELBE Referenzskala (3000 ml/h) wie speedDialysat
+  /// und speedSubst. Dadurch gilt mathematisch garantiert:
+  ///   speedEffluent = (qd + quf + qs) / 3000  >=  qd/3000  UND  >=  qs/3000
+  /// d.h. die Abflusspumpe kann NIE langsamer wirken als Dialysat- oder
+  /// Substitutionspumpe allein – exakt das klinisch korrekte Bild, da sie ja
+  /// beide Zuflüsse PLUS den Netto-Entzug gemeinsam abführen muss.
+  static const double _qEffVisualMax = 3000;
 
-  /// Drehgeschwindigkeit der Abflusspumpe – DIREKT proportional zu Qeff.
-  /// Qeff = QD + QUF + QS(Prä) (siehe getter oben), d.h. ändert sich die
-  /// Dialysatlaufrate (QD) um einen bestimmten Betrag, ändert sich Qeff und
-  /// damit auch diese Drehgeschwindigkeit im exakt gleichen Umfang (linear 1:1) –
-  /// keine unabhängig gewichtete Mischformel mehr, sondern echte Kopplung an Qeff.
+  /// Drehgeschwindigkeit der Abflusspumpe – DIREKT proportional zu Qeff = QD + QUF + QS
+  /// (immer inkl. Substituat, unabhängig von Prä-/Postdilution, siehe qEff-Getter oben).
   double get speedEffluent {
     if (qEff <= 0) return 0;
     return (qEff / _qEffVisualMax).clamp(0.05, 1.0);

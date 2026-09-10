@@ -211,9 +211,8 @@ class _MonitorPanelState extends State<MonitorPanel> {
 
   Widget _buildQeffBox(CrrtState st) {
     const maxRef = 6000.0;
-    final showQS = st.qs > 0 && st.subMode == SubMode.pre;
+    final showQS = st.qs > 0;
     final qdLabel = st.hasDialysat ? 'QD + ' : '';
-    final qsNote = showQS ? '' : (st.qs > 0 ? ' (Post→Patient)' : '');
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(10),
@@ -233,7 +232,7 @@ class _MonitorPanelState extends State<MonitorPanel> {
               children: [
                 TextSpan(text: 'Die Abflusspumpe transportiert '),
                 TextSpan(text: '100%', style: TextStyle(color: AppColors.warn, fontWeight: FontWeight.bold)),
-                TextSpan(text: ' des Dialysats + den eingestellten Flüssigkeitsentzug in den Ablaufbeutel.'),
+                TextSpan(text: ' des Dialysats + des Substituats + den eingestellten Flüssigkeitsentzug in den Ablaufbeutel – unabhängig von Prä-/Postdilution.'),
               ],
             ),
           ),
@@ -247,7 +246,7 @@ class _MonitorPanelState extends State<MonitorPanel> {
           QeffBarRow(name: '= Abflusspumpe', color: AppColors.warn, fraction: st.qEff / maxRef, valueText: '${st.qEff.round()} ml/h', nameColor: AppColors.warn),
           const SizedBox(height: 6),
           Text(
-            'Qeff = ${qdLabel}QUF${showQS ? ' + QS(Prä)' : qsNote}\nQeff = ${st.hasDialysat ? '${st.qd.round()} + ' : ''}${st.quf.round()}${showQS ? ' + ${st.qs.round()}' : ''} = ${st.qEff.round()} ml/h',
+            'Qeff = ${qdLabel}QUF${showQS ? ' + QS' : ''}\nQeff = ${st.hasDialysat ? '${st.qd.round()} + ' : ''}${st.quf.round()}${showQS ? ' + ${st.qs.round()}' : ''} = ${st.qEff.round()} ml/h',
             style: const TextStyle(fontSize: 10.5, color: AppColors.textDim, fontFamily: 'monospace', height: 1.5),
           ),
         ],
@@ -276,8 +275,10 @@ class _MonitorPanelState extends State<MonitorPanel> {
             QeffBarRow(name: '⑤ Substitution', color: AppColors.substituate, fraction: st.speedSubst, valueText: '${(st.speedSubst * 100).round()}%', nameColor: AppColors.substituate),
           QeffBarRow(name: '① Abflusspumpe', color: AppColors.warn, fraction: st.speedEffluent, valueText: '${(st.speedEffluent * 100).round()}%', nameColor: AppColors.warn),
           const SizedBox(height: 4),
-          const Text('■ QD-Anteil   ■ Entzug-Anteil  →  Abflusspumpe dreht schneller wenn QD↑ oder Entzug↑',
-              style: TextStyle(fontSize: 9.5, color: AppColors.textDim)),
+          Text(
+            '■ QD-Anteil   ■ Entzug-Anteil${st.hasSubstPump ? '   ■ QS-Anteil' : ''}  →  Abflusspumpe dreht schneller wenn QD↑, Entzug↑ oder QS↑',
+            style: const TextStyle(fontSize: 9.5, color: AppColors.textDim),
+          ),
         ],
       ),
     );

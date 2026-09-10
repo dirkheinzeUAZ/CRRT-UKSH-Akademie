@@ -6,31 +6,35 @@ import '../../models/crrt_state.dart';
 import 'draw_utils.dart';
 
 /// Visualisiert an der Abflusspumpe, aus welchen Anteilen sich ihre Fördermenge
-/// zusammensetzt (Dialysat / Entzug / ggf. Substituat bei Prädilution) –
-/// zeigt anschaulich die "Kommunikation" der Pumpen untereinander.
+/// zusammensetzt (Dialysat / Entzug / Substituat) – zeigt anschaulich die
+/// "Kommunikation" der Pumpen untereinander. Das Substituat wird HIER IMMER
+/// berücksichtigt (unabhängig von Prä-/Postdilution), da es klinisch stets
+/// zusätzlich zum Netto-Entzug abgeführt werden muss (siehe qEff-Getter).
+/// Die drei Segmente sind echte Anteile am Gesamt-Qeff (Kreis = 100% von Qeff).
 void drawEffluentIndicator(Canvas canvas, CrrtState st) {
   const cx = ML.p1cx, cy = ML.p1cy, r = ML.p1r;
   final outerR = r + 16;
 
-  final qd = st.qd / 3000;
-  final quf = st.quf / 2500;
-  final qsPreFrac = (st.qs > 0 && st.subMode == SubMode.pre) ? st.qs / 3000 * 0.10 : 0.0;
+  final qEff = st.qEff;
+  final qdFrac = qEff > 0 ? st.qd / qEff : 0.0;
+  final qufFrac = qEff > 0 ? st.quf / qEff : 0.0;
+  final qsFrac = qEff > 0 ? st.qs / qEff : 0.0;
 
   double start = -math.pi / 2;
-  if (st.hasDialysat && qd > 0) {
-    final sweep = math.pi * 2 * qd;
+  if (st.hasDialysat && qdFrac > 0) {
+    final sweep = math.pi * 2 * qdFrac;
     canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy), radius: outerR), start, sweep, false,
         Paint()..color = AppColors.dialysate..strokeWidth = 6..style = PaintingStyle.stroke..strokeCap = StrokeCap.round);
     start += sweep;
   }
-  if (quf > 0) {
-    final sweep = math.pi * 2 * quf;
+  if (qufFrac > 0) {
+    final sweep = math.pi * 2 * qufFrac;
     canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy), radius: outerR), start, sweep, false,
         Paint()..color = const Color(0xFFE94560)..strokeWidth = 6..style = PaintingStyle.stroke..strokeCap = StrokeCap.round);
     start += sweep;
   }
-  if (qsPreFrac > 0) {
-    final sweep = math.pi * 2 * qsPreFrac;
+  if (qsFrac > 0) {
+    final sweep = math.pi * 2 * qsFrac;
     canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy), radius: outerR), start, sweep, false,
         Paint()..color = AppColors.substituate..strokeWidth = 6..style = PaintingStyle.stroke..strokeCap = StrokeCap.round);
   }
@@ -48,7 +52,7 @@ void drawEffluentIndicator(Canvas canvas, CrrtState st) {
   }
   drawText(canvas, 'QUF', Offset(lx, ly), color: const Color(0xFFE94560), fontSize: 8, fontFamily: 'sans-serif');
   ly += 12;
-  if (qsPreFrac > 0) {
+  if (st.qs > 0) {
     drawText(canvas, 'QS', Offset(lx, ly), color: AppColors.substituate, fontSize: 8, fontFamily: 'sans-serif');
   }
 }

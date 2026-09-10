@@ -139,7 +139,7 @@ class _ControlPanelState extends State<ControlPanel> {
                 const Text('⚙ Automatisch berechnet – nicht manuell einstellbar',
                     style: TextStyle(fontSize: 10, color: AppColors.warn)),
                 Text(
-                  'Qeff = ${st.hasDialysat ? 'QD + ' : ''}QUF${(st.qs > 0 && st.subMode == SubMode.pre) ? ' + QS(Prä)' : ''} = ${st.qEff.round()} ml/h',
+                  'Qeff = ${st.hasDialysat ? 'QD + ' : ''}QUF${st.qs > 0 ? ' + QS' : ''} = ${st.qEff.round()} ml/h',
                   style: const TextStyle(fontSize: 11.5, color: AppColors.warn, fontFamily: 'monospace', fontWeight: FontWeight.bold),
                 ),
               ],
