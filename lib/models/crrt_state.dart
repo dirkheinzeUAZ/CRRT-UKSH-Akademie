@@ -189,11 +189,20 @@ class CrrtState extends ChangeNotifier {
   double get speedBlood => qb / 300;
   double get speedDialysat => qd / 3000;
   double get speedSubst => qs / 3000;
-  double get speedEffluent =>
-      0.15 +
-      (qd / 3000) * 0.45 +
-      (quf / 2500) * 0.40 +
-      (subMode == SubMode.pre ? qs / 3000 * 0.10 : 0);
+
+  /// Referenzwert für "volle Drehzahl" der Abflusspumpe (rein visuelle Skalierung).
+  /// QD_max (3000) + QUF_max (2500) wird als realistischer Referenzrahmen genutzt.
+  static const double _qEffVisualMax = 3000 + 2500;
+
+  /// Drehgeschwindigkeit der Abflusspumpe – DIREKT proportional zu Qeff.
+  /// Qeff = QD + QUF + QS(Prä) (siehe getter oben), d.h. ändert sich die
+  /// Dialysatlaufrate (QD) um einen bestimmten Betrag, ändert sich Qeff und
+  /// damit auch diese Drehgeschwindigkeit im exakt gleichen Umfang (linear 1:1) –
+  /// keine unabhängig gewichtete Mischformel mehr, sondern echte Kopplung an Qeff.
+  double get speedEffluent {
+    if (qEff <= 0) return 0;
+    return (qEff / _qEffVisualMax).clamp(0.05, 1.0);
+  }
 
   // ---------------- Animation Tick (60fps, kein notifyListeners) ----------------
   void animTick(double dtSeconds) {
