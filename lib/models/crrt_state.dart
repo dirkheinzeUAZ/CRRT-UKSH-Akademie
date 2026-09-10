@@ -190,20 +190,38 @@ class CrrtState extends ChangeNotifier {
   double get speedDialysat => qd / 3000;
   double get speedSubst => qs / 3000;
 
-  /// Referenzwert für "volle Drehzahl" der Abflusspumpe (rein visuelle Skalierung).
-  /// WICHTIG: Nutzt bewusst DIESELBE Referenzskala (3000 ml/h) wie speedDialysat
-  /// und speedSubst. Dadurch gilt mathematisch garantiert:
-  ///   speedEffluent = (qd + quf + qs) / 3000  >=  qd/3000  UND  >=  qs/3000
-  /// d.h. die Abflusspumpe kann NIE langsamer wirken als Dialysat- oder
-  /// Substitutionspumpe allein – exakt das klinisch korrekte Bild, da sie ja
-  /// beide Zuflüsse PLUS den Netto-Entzug gemeinsam abführen muss.
-  static const double _qEffVisualMax = 3000;
+  /// Maximaler Einstellbereich des Netto-Entzugs (QUF) im aktuellen Modus –
+  /// entspricht dem `max`-Wert des Sliders in control_panel.dart (500 im
+  /// SCUF-Modus, sonst 2500 ml/h).
+  double get _qufMaxForMode => mode == CrrtMode.scuf ? 500 : 2500;
 
-  /// Drehgeschwindigkeit der Abflusspumpe – DIREKT proportional zu Qeff = QD + QUF + QS
-  /// (immer inkl. Substituat, unabhängig von Prä-/Postdilution, siehe qEff-Getter oben).
+  /// Drehgeschwindigkeit der Abflusspumpe (0..1, rein visuelle Skalierung).
+  ///
+  /// Zwei klinisch wichtige Eigenschaften müssen GLEICHZEITIG erfüllt sein:
+  ///  1) Die Abflusspumpe darf NIE langsamer wirken als Dialysat- oder
+  ///     Substitutionspumpe allein – sie muss ja beide Zuflüsse abführen.
+  ///     → deshalb "floor" = max(speedDialysat, speedSubst) als Untergrenze.
+  ///  2) Eine Erhöhung des Netto-Entzugs (QUF) MUSS sich sichtbar in einer
+  ///     höheren Drehzahl niederschlagen (mehr Entzug = mehr Ultrafiltrat =
+  ///     mehr Abfluss) – und zwar über den GESAMTEN Schieberegler-Bereich,
+  ///     nicht nur am Anfang (sonst "hängt" die Anzeige bei höheren Werten).
+  ///     → deshalb wird der verbleibende Spielraum bis 100% proportional zum
+  ///        QUF-Anteil aufgefüllt: floor + (1 - floor) * qufFraction.
+  ///
+  /// Ergebnis: Bei QUF=0 ist die Abflussgeschwindigkeit EXAKT gleich der
+  /// höheren der beiden Zufluss-Pumpen (korrekt, da dann nur deren Menge
+  /// abgeführt werden muss). Steigt QUF, wächst die Geschwindigkeit stetig
+  /// bis auf 100% beim Maximalwert des Reglers – unabhängig davon, wie hoch
+  /// QD/QS bereits eingestellt sind.
   double get speedEffluent {
     if (qEff <= 0) return 0;
-    return (qEff / _qEffVisualMax).clamp(0.05, 1.0);
+    final floorDialysat = qd / 3000;
+    final floorSubst = qs / 3000;
+    final floor = floorDialysat > floorSubst ? floorDialysat : floorSubst;
+    final qufFraction =
+        _qufMaxForMode > 0 ? (quf / _qufMaxForMode).clamp(0.0, 1.0) : 0.0;
+    final raw = floor + (1 - floor) * qufFraction;
+    return raw.clamp(0.05, 1.0);
   }
 
   // ---------------- Animation Tick (60fps, kein notifyListeners) ----------------
